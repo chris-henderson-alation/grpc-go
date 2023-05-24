@@ -621,13 +621,14 @@ func (p *parser) recvMsg(maxReceiveMessageSize int) (pf payloadFormat, msg []byt
 		p.buf = make([]byte, length)
 	}
 	//msg = make([]byte, int(length))
+	msg = p.buf[:length]
 	if _, err := p.r.Read(p.buf); err != nil {
 		if err == io.EOF {
 			err = io.ErrUnexpectedEOF
 		}
 		return 0, nil, err
 	}
-	return pf, p.buf[:length], nil
+	return pf, msg, nil
 }
 
 // encode serializes msg and returns a buffer containing the message, or an
