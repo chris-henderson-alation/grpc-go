@@ -627,7 +627,7 @@ func (p *parser) recvMsg(maxReceiveMessageSize int) (pf payloadFormat, msg []byt
 		}
 		return 0, nil, err
 	}
-	return pf, p.buf, nil
+	return pf, p.buf[:length], nil
 }
 
 // encode serializes msg and returns a buffer containing the message, or an
