@@ -577,6 +577,8 @@ type parser struct {
 	// The header of a gRPC message. Find more detail at
 	// https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
 	header [5]byte
+
+	buf []byte
 }
 
 // recvMsg reads a complete gRPC message from the stream.
@@ -612,7 +614,11 @@ func (p *parser) recvMsg(maxReceiveMessageSize int) (pf payloadFormat, msg []byt
 	}
 	// TODO(bradfitz,zhaoq): garbage. reuse buffer after proto decoding instead
 	// of making it for each message:
-	msg = make([]byte, int(length))
+	if p.buf == nil || int(length) > len(p.buf) {
+		p.buf = make([]byte, length)
+	}
+	//msg = make([]byte, int(length))
+	msg = p.buf[:length]
 	if _, err := p.r.Read(msg); err != nil {
 		if err == io.EOF {
 			err = io.ErrUnexpectedEOF
